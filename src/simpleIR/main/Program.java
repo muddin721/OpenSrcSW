@@ -106,7 +106,7 @@ public class Program {
 			trans.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 			
 			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(new FileOutputStream(dir + "/result.xml"));
+			StreamResult result = new StreamResult(new FileOutputStream(dir + "/collection.xml"));
 			
 			trans.transform(source, result);
 			//
@@ -143,6 +143,8 @@ public class Program {
 		}
 		
 		writeXMLFile(dir, data);
+		
+		System.out.println("XML 파일이 생성되었습니다.");
 		
 		scanner.close();
 	}
