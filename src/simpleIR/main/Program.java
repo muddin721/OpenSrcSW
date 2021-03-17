@@ -1,5 +1,5 @@
-package simpleIR.main;
- 
+package simpleIR.main; 
+
 import java.io.*;
 import java.util.Scanner;
 
@@ -10,6 +10,8 @@ import javax.xml.transform.stream.*;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import org.snu.ids.kkma.index.*;
 
 class HTMLElement{
 	public String title = null;
@@ -22,6 +24,25 @@ class HTMLElement{
 
 public class Program {
   
+	public static String extractKeyword(String body) {  
+		KeywordExtractor ke = new KeywordExtractor();
+		
+		KeywordList kl = ke.extractKeyword(body, true);
+		
+		 StringBuilder sb = new StringBuilder();
+		 
+		for(int i = 0; i < kl.size(); i++) {
+			Keyword kwrd = kl.get(i);
+			
+			sb.append(kwrd.getString());
+			sb.append(":"); 
+			sb.append(kwrd.getCnt()); 
+			sb.append("#");
+		}
+		
+		return sb.toString();
+	}
+	
 	//입력된 경로 하위 폴더에 있는 모든 HTML 파일의 객체를 반환합니다.
 	public static File[] findHTMLFiles(String dir) {
 		File file = new File(dir);
@@ -88,7 +109,7 @@ public class Program {
 		}
 	}
 	
-	public static void writeXMLFile(String dir, final HTMLElement[] data) {
+	public static void writeXMLFile(String dir, String filename, final HTMLElement[] data) {
 		try{  
 			DocumentBuilderFactory docFac = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFac.newDocumentBuilder();
@@ -98,7 +119,6 @@ public class Program {
 			//입력된 data를 XML 요소를 추가합니다.
 			addXMLElements(doc, data); 
 			
-			
 			//XML 파일을 저장합니다.
 			TransformerFactory transFac = TransformerFactory.newInstance();
 			
@@ -106,7 +126,7 @@ public class Program {
 			trans.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
 			
 			DOMSource source = new DOMSource(doc);
-			StreamResult result = new StreamResult(new FileOutputStream(dir + "/collection.xml"));
+			StreamResult result = new StreamResult(new FileOutputStream(dir + "/" + filename + ".xml"));
 			
 			trans.transform(source, result);
 			//
@@ -142,7 +162,13 @@ public class Program {
 			data[i] = readHTMLFile(files[i]);
 		}
 		
-		writeXMLFile(dir, data);
+		writeXMLFile(dir, "collection", data);
+		
+		for(int i = 0; i < files.length; i++) {
+			data[i].body = extractKeyword(data[i].body);
+		}
+		
+		writeXMLFile(dir, "index", data);
 		
 		System.out.println("XML 파일이 생성되었습니다.");
 		
