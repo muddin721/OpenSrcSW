@@ -2,6 +2,9 @@ package simpleIR.main;
 
 import java.io.*;
 import java.util.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import javax.xml.parsers.*;
 import javax.xml.transform.*;
@@ -44,13 +47,13 @@ public class makeCollection {
 	public static IRElement readHTMLFile(File file) {
 		IRElement result = new IRElement();
 		
-		try {  
-				 Scanner scanner = new Scanner(file);
-				 
+		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),"UTF8"))) {    
+		    
 				 StringBuilder sb = new StringBuilder();
 				 
-				 while(scanner.hasNextLine()) { 
-					 String str = scanner.nextLine().trim();
+				 String line;
+				 while ((line = reader.readLine()) != null) {
+					 String str = line.trim();
 					  
 					 if(str.startsWith("<title>")) {
 						 result.title = str.replace("<title>", "").replace("</title>", "");
@@ -59,14 +62,15 @@ public class makeCollection {
 						 sb.append(str.replace("<p>", "").replace("</p>", ""));
 						 sb.append('\n');
 					 }
-				 }
+				 } 
 				 
-				 result.body = sb.toString();
-				 
-				 scanner.close();
+				 result.body = sb.toString(); 
 		}
 		catch(FileNotFoundException ex) {
 				System.err.println("파일을 찾을 수 없습니다.");
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
 		}  
 		
 		return result;
@@ -98,8 +102,8 @@ public class makeCollection {
 			DocumentBuilderFactory docFac = DocumentBuilderFactory.newInstance();
 			DocumentBuilder docBuilder = docFac.newDocumentBuilder();
 			
-			Document doc = docBuilder.newDocument(); 
-
+			Document doc = docBuilder.newDocument();
+			
 			//입력된 data를 XML 요소를 추가합니다.
 			addXMLElements(doc, data); 
 			
@@ -108,6 +112,9 @@ public class makeCollection {
 			
 			Transformer trans = transFac.newTransformer();
 			trans.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
+			
+			Path pathToFile = Paths.get(dir);
+			Files.createDirectories(pathToFile.getParent());
 			
 			DOMSource source = new DOMSource(doc);
 			StreamResult result = new StreamResult(new FileOutputStream(dir));
@@ -127,6 +134,9 @@ public class makeCollection {
 			e.printStackTrace();
 		}
 		catch (ParserConfigurationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}  
