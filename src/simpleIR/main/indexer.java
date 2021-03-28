@@ -27,49 +27,55 @@ class InvertedElement implements Serializable{
 	 */
 	private static final long serialVersionUID = -2688140763939423573L;
 	public int id;
-	public double weight;
+	public float weight;
 	
-	public InvertedElement(int _id, double _weight) {
+	public InvertedElement(int _id, float _weight) {
 		id = _id;
 		weight = _weight;
 	} 
 	
 	@Override
 	public String toString() {
-		return String.format("id : %d weight : %.4f\n", id, weight); 
+		return String.format("id : %d weight : %.2f\n", id, weight); 
 	}
 }
 
 public class indexer{
 
-	public static int getTF(Keyword term, KeywordList doc) {
-
-		if(doc.contains(term)) {
-			int index = doc.indexOf(term);
-			
-			return doc.get(index).getCnt();
-		}
-		else return 0; 
-	}
-	
-	public static int getDF(Keyword term, KeywordList[] docs) {
-		int result = 0;
-		for(int i = 0; i < docs.length; i++) {
-			if(docs[i].contains(term)) {
-				result++;
+	public static int find(Keyword term, KeywordList doc) {
+		for(int i = 0; i < doc.size(); i++) {
+			if(doc.get(i).getString().equals(term.getString())) {
+				return i;
 			}
 		}
-		return result;
+		return -1;
 	}
 	
-	public static double getWeight(Keyword term, int id, KeywordList[] docs) {
-		double tf = getTF(term, docs[id]);
-		double df = getDF(term, docs);
+	public static float getTF(Keyword term, KeywordList doc) { 
+		int index = find(term, doc);
 		
-		return tf * Math.log((double)docs.length / df);
+		if (index != -1) return doc.get(index).getCnt();
+		else return 0.0f;
 	}
 	
-	public static HashMap<String, Inverted> createHashMap(KeywordList[] kl){
+	public static float getDF(Keyword term, KeywordList[] docs) {
+		int result = 0;
+		for(int i = 0; i < docs.length; i++) {
+			if(find(term, docs[i]) != -1) {
+				result++;
+			} 
+		} 
+		return (float)Math.log(docs.length / (double)result);
+	}
+	
+	public static float getWeight(Keyword term, int id, KeywordList[] docs) {
+		float tf = getTF(term, docs[id]);
+		float df = getDF(term, docs);
+		
+		return tf * df;
+	}
+	
+	public static HashMap<String, Inverted> createHashMap(final KeywordList[] kl){
 		var result = new HashMap<String, Inverted>(); 
 
 		KeywordList total = new KeywordList(new ArrayList<Keyword>());
@@ -81,10 +87,13 @@ public class indexer{
 		for(int i = 0; i < total.size(); i++) {
 			Inverted inverted = new Inverted();
 			
-			Keyword keyword = total.get(i);
+			Keyword keyword = total.get(i); 
 			
 			for(int j = 0; j < kl.length; j++) { 
-				inverted.list.add(new InvertedElement(j, getWeight(keyword, j, kl)));
+				float weight = getWeight(keyword, j, kl);
+				if(weight != 0.0f) { 
+					inverted.list.add(new InvertedElement(j, weight)); 
+				}
 			}
 			
 			result.put(keyword.getString(), inverted);
