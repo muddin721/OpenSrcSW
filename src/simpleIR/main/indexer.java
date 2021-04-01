@@ -14,9 +14,16 @@ class Inverted implements Serializable{
 	@Override
 	public String toString() { 
 		StringBuilder sb = new StringBuilder();
-		for(var element : list) {
-			sb.append(element.toString());
+		
+		sb.append("[ ");
+		for(int i = 0; i < list.size(); i++) {
+			sb.append(list.get(i).toString());
+			
+			if(i != list.size() - 1) {
+				sb.append(", ");
+			}
 		}
+		sb.append(" ]");
 		return sb.toString();
 	}
 }
@@ -36,7 +43,7 @@ class InvertedElement implements Serializable{
 	
 	@Override
 	public String toString() {
-		return String.format("id : %d weight : %.2f\n", id, weight); 
+		return String.format("%d : %.2f", id, weight); 
 	}
 }
 
@@ -78,8 +85,7 @@ public class indexer{
 	public static HashMap<String, Inverted> createHashMap(final KeywordList[] kl){
 		var result = new HashMap<String, Inverted>(); 
 
-		KeywordList total = new KeywordList(new ArrayList<Keyword>());
-		
+		KeywordList total = new KeywordList(new ArrayList<Keyword>()); 
 		for(int i = 0; i < kl.length; i++) {  
 			total.addAll(kl[i]);
 		}
@@ -119,5 +125,27 @@ public class indexer{
 			e.printStackTrace();
 		}
 		
+	}
+	
+	@SuppressWarnings("unchecked")
+	public static HashMap<String, Inverted> readHashMap(String dir){
+		HashMap<String, Inverted> result = null;
+		
+		try { 
+			FileInputStream fileStream = new FileInputStream(dir);
+			
+			ObjectInputStream objectOutputStream = new ObjectInputStream(fileStream);
+		
+			result = (HashMap<String, Inverted>)objectOutputStream.readObject();
+			
+			objectOutputStream.close(); 
+		}
+		catch(IOException e) {
+			e.printStackTrace();
+		} catch (ClassNotFoundException e) { 
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 }
