@@ -68,8 +68,8 @@ public class makeCollection {
 		}
 		catch(FileNotFoundException ex) {
 				System.err.println("파일을 찾을 수 없습니다.");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+		}
+		catch (IOException e) {
 			e.printStackTrace();
 		}  
 		
