@@ -30,6 +30,8 @@ public class searcher {
 			}
 		 } 
 		 
+		
+		 
 		 var result = new ArrayList<Result>();
 		 
 		 for(int i = 0; i < col.length; i++) {
@@ -38,6 +40,7 @@ public class searcher {
 			 float a = 0, b = 0;
 			 
 			 for(Keyword keyword : kl) {  
+				 
 				 if(data.containsKey(keyword.getString())) {
 					 Inverted inverted = data.get(keyword.getString());
 					 
@@ -46,20 +49,21 @@ public class searcher {
 							 result.get(i).dot += 1f * element.weight;
 							 
 							 a += element.weight * element.weight;
-							 b += 1 * 1f;
+							 b += 1f * 1f;
 							 
 							 break;
 						 }
-					 }
-				 } 
-			 }
+					 } 
+				 }  
+			 } 
 			 
-			 float p = (float) (Math.sqrt(a) *  Math.sqrt(b));
+			 float p = (float) (Math.sqrt(a) * Math.sqrt(b));
 			 
-			 if(p!= 0) {
+			 if(p != 0) {
 				 result.get(i).dot /= p;
 			 }
 		 }  
+
 		 
 		 Collections.sort(result);
 		 
