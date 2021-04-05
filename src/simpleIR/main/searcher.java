@@ -30,8 +30,6 @@ public class searcher {
 			}
 		 } 
 		 
-		
-		 
 		 var result = new ArrayList<Result>();
 		 
 		 for(int i = 0; i < col.length; i++) {
