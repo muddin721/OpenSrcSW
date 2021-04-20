@@ -24,8 +24,10 @@ public class getSnippet {
 			}
 			
 			String filePath = args[1];
+	
+			String fileContents = read(new File("./" + filePath));
+			
 			String[] input = args[3].split(" ");
-			String fileContents = read(new File("./input.txt"));
 			
 			String[] contents = fileContents.split("\n");
 			
@@ -49,25 +51,25 @@ public class getSnippet {
 				}
 				
 				for(int j = 0; j < input.length; j++) {
-					count[i]++;
+					if(set.get(i).contains(input[j])) { 
+						count[i]++;
+					}
 				}
 			}
 			
 			int maxIndex = 0;
-			for(int i = 0; i < contents.length; i++) {
-				if(count[maxIndex] < count[i]) {
+			for(int i = 0; i < count.length; i++) {
+				if(count[maxIndex] <= count[i]) {
 					maxIndex = i;
 				}
 			}
-			
-			
+			 
 			System.out.println(contents[maxIndex]);
 		}
 	}
 	
 	public static String read(File file) { 
-		StringBuilder sb = new StringBuilder();
-		
+		StringBuilder sb = new StringBuilder(); 
 		
 		try (BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(file),"UTF8"))) {    
 			String line;
